@@ -1,5 +1,3 @@
-// src/main.tsx
-import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
@@ -15,6 +13,7 @@ try {
   const saved = localStorage.getItem('darkMode');
   if (saved === 'true') {
     document.documentElement.classList.add('dark');
+    
   } else if (saved === 'false') {
     document.documentElement.classList.remove('dark');
   }
@@ -26,7 +25,7 @@ try {
 }
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+  
     <App />
-  </StrictMode>
+ 
 );
