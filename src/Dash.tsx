@@ -25,7 +25,11 @@ function Dash() {
   const [provider, setProvider] = useState<Provider | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [darkMode, setDarkMode] = useState(() => {
-    return JSON.parse(localStorage.getItem('darkMode') || 'false');
+    try {
+      return JSON.parse(localStorage.getItem('darkMode') || 'false');
+    } catch {
+      return false;
+    }
   });
 
   const API_BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -74,12 +78,17 @@ function Dash() {
     };
   }, []); // Empty dependency array to run this effect only once when the component is mounted
 
-  // apply initial theme on mount and when darkMode changes
+  // apply theme class to root on mount and whenever darkMode changes
   useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    try {
+      if (darkMode) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    } catch (e) {
+      // ignore (e.g. server side or restricted environment)
+      console.warn('Could not apply theme class', e);
     }
   }, [darkMode]);
 
@@ -87,7 +96,12 @@ function Dash() {
   const handleToggleDarkMode = () => {
     const newMode = !darkMode;
     setDarkMode(newMode);
-    localStorage.setItem('darkMode', JSON.stringify(newMode));
+    try {
+      localStorage.setItem('darkMode', JSON.stringify(newMode));
+    } catch (e) {
+      // ignore storage errors
+      console.warn('Could not persist theme preference', e);
+    }
     // document.documentElement class toggled via effect above
   };
 
