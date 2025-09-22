@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { GoogleOAuthProvider } from "@react-oauth/google";
@@ -21,7 +21,6 @@ import AdminPanel from "./pages/Admin";
 import VehicleDetails from "./pages/VehicleDetails";
 import MyBookings from "./components/parking/MyBookings";
 import ProviderBookings from "./pages/ProivderBookings";
-import Page from "./pages/Page";
 import AddVehicle from "./pages/AddVechicle";
 import VehicleList from "./pages/VehicleList";
 import TrackNowPage from "./components/parking/TrackNowPage";
@@ -32,6 +31,11 @@ import Front from "./pages/Front";
 import Favorites from './pages/Favorite'
 import FindParking from "./components/search/FindParking";
 import Profile from "./pages/Profile";
+
+// Firebase imports
+import { messaging } from "./firebase";
+import { getToken, onMessage } from "firebase/messaging";
+import { useFirebaseMessaging } from "./hooks/useFirebaseMessaging";
 
 export default function App() {
   return (
@@ -51,12 +55,51 @@ export default function App() {
 function AppRoutes() {
   const { user } = useAuth(); // 🔹 Get user authentication status from context
 
+
+    // For Notify Foreground 
+  // useEffect(() => {
+  //   const initFirebaseMessaging = async () => {
+  //     try {
+  //       // 1️⃣ Request notification permission
+  //       const permission = await Notification.requestPermission();
+  //       if (permission !== "granted") {
+  //         console.warn("Notification permission not granted");
+  //         return;
+  //       }
+
+  //       // 2️⃣ Get FCM token
+  //       const token = await getToken(messaging, {
+  //         vapidKey: "BIrqu-G8cdBfGaxbvCwBTfPYuFxcOqCQBfbDqcN1zy_e_lpxej2ehbjjmrAwq1PcjqrOFnsqj_IcpN2ssSbp-jo", // Replace with your key
+  //       });
+  //       console.log("FCM Token:", token);
+
+  //       // 3️⃣ Foreground message listener
+  //       onMessage(messaging, (payload) => {
+  //         console.log("Foreground message received:", payload);
+
+  //         // Show native notification immediately
+  //         if (payload.notification) {
+  //           new Notification(payload.notification.title || "Notification", {
+  //             body: payload.notification.body,
+  //             icon: payload.notification.icon || "/logo192.png",
+  //           });
+  //         }
+  //       });
+  //     } catch (err) {
+  //       console.error("Firebase messaging error:", err);
+  //     }
+  //   };
+
+  //   initFirebaseMessaging();
+  // }, []);
+
+useFirebaseMessaging()
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <Routes>
         <Route path="/" element={user ? <Home /> : <Front />} />
-
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -67,7 +110,7 @@ function AppRoutes() {
         <Route path="/track" element={<ProtectedRoute><TrackNowPage /></ProtectedRoute>} />
         <Route path="/filter-parking" element={<ProtectedRoute><FilterParkingPage /></ProtectedRoute>} />
         <Route path="/parking-details" element={<ProtectedRoute><ParkingDetails /></ProtectedRoute>} />
-        <Route path="/check-vechile" element={<ProtectedRoute> <VehicleList /></ProtectedRoute>} />
+        <Route path="/check-vechile" element={<ProtectedRoute><VehicleList /></ProtectedRoute>} />
         <Route path="/bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
         <Route path="/parkingprovider" element={<ProtectedRoute><ProviderBookings /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute requiresAdmin><AdminPanel /></ProtectedRoute>} />
